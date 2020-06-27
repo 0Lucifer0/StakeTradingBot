@@ -28,5 +28,4 @@ Yes you can!
 It will automatically setup this tool as a windows service.
 
 ## How to use it ? ##
-To be able to use this soft you need to ask Sharesight API access. 
-then just fill the config file config.yml
+just fill the config file config.yml
