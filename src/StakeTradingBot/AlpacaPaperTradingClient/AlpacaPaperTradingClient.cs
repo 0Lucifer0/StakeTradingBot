@@ -109,7 +109,7 @@ namespace StakeTradingBot.AlpacaPaperTradingClient
             throw new ArgumentException();
         }
 
-        private async Task SendTransaction(TransactionType transactionType, Order order)
+        private async Task SendTransaction(Order order)
         {
             var instrument = await GetInstrumentFromSymbol(order.Symbol);
             if (instrument == null)
@@ -130,7 +130,7 @@ namespace StakeTradingBot.AlpacaPaperTradingClient
             var content = new StringContent(JsonSerializer.Serialize(new AlpacaOrder
             {
                 Quantity = order.Quantity.ToString(CultureInfo.InvariantCulture),
-                Side = transactionType.ToString().ToLowerInvariant(),
+                Side = order.TransactionType.ToString().ToLowerInvariant(),
                 Symbol = instrument.InstrumentId.ToString(),
                 TimeInForce = "day",
                 Type = OrderType.Market.ToString().ToLowerInvariant()
@@ -139,22 +139,24 @@ namespace StakeTradingBot.AlpacaPaperTradingClient
             var result = await httpClient.PostAsync($"v2/orders", content);
             if (result.IsSuccessStatusCode)
             {
-                _logger.LogInformation($"{transactionType} order submitted!");
+                _logger.LogInformation($"{order.TransactionType} order submitted!");
                 return;
             }
 
-            _logger.LogError($"Error while {transactionType}ing order failed", result.ReasonPhrase);
+            _logger.LogError($"Error while {order.TransactionType}ing order failed", result.ReasonPhrase);
             throw new ArgumentException();
         }
 
         public Task Sell(Order order)
         {
-            return SendTransaction(TransactionType.Sell, order);
+            order.TransactionType = TransactionType.Sell;
+            return SendTransaction(order);
         }
 
         public Task Buy(Order order)
         {
-            return SendTransaction(TransactionType.Buy, order);
+            order.TransactionType = TransactionType.Buy;
+            return SendTransaction(order);
         }
 
         public async Task<float> GetCashAvailable()
