@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace StakeTradingBot.StakeClient.Model
+namespace StakeTradingBot
 {
     public class Status
     {

@@ -44,7 +44,7 @@ namespace StakeTradingBot
                     {
                         case "Stake":
                             var stakeConfiguration = new StakeConfiguration();
-                            conf.Bind(stakeConfiguration);
+                            conf.GetSection("StakeClient").Bind(stakeConfiguration);
                             services.AddSingleton(stakeConfiguration);
                             services.AddTransient<ITradingClient, StakeClient.StakeClient>();
                             break;
@@ -52,9 +52,9 @@ namespace StakeTradingBot
                         case "AlpacaPaperTrading":
                         default:
                             var alpacaPaperConfiguration = new AlpacaPaperTradingClientConfiguration();
-                            conf.Bind(alpacaPaperConfiguration);
+                            conf.GetSection("AlpacaPaperTradingClient").Bind(alpacaPaperConfiguration);
                             services.AddSingleton(alpacaPaperConfiguration);
-                            services.AddTransient<ITradingClient, AlpacaPaperTradingClient>();
+                            services.AddTransient<ITradingClient, AlpacaPaperTradingClient.AlpacaPaperTradingClient>();
                             break;
                     }
 

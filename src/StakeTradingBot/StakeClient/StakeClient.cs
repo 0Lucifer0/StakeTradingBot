@@ -56,6 +56,7 @@ namespace StakeTradingBot.StakeClient
                 return;
             }
 
+            _authModel = null;
             _logger.LogError("Connection to Stake failed", result.ReasonPhrase);
             throw new ArgumentException();
         }
@@ -130,7 +131,7 @@ namespace StakeTradingBot.StakeClient
                 ItemId = instrument.InstrumentId.ToString(),
                 ItemType = "instrument",
                 LimitPrice = string.Empty,
-                OrderType = OrderType.Market,
+                OrderType = OrderType.Market.ToString().ToLowerInvariant(),
                 Quantity = order.Quantity.ToString(CultureInfo.InvariantCulture),
                 StopPrice = string.Empty,
                 UserId = _authModel.UserId.ToString()

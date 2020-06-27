@@ -20,7 +20,7 @@ namespace StakeTradingBot.StakeClient.Model
         public string LimitPrice { get; set; } = string.Empty;
 
         [JsonPropertyName("orderType")]
-        public OrderType OrderType { get; set; }
+        public string OrderType { get; set; } = string.Empty;
 
         [JsonPropertyName("quantity")]
         public string Quantity { get; set; } = string.Empty;
@@ -30,13 +30,5 @@ namespace StakeTradingBot.StakeClient.Model
 
         [JsonPropertyName("userId")]
         public string UserId { get; set; } = string.Empty;
-    }
-
-    public enum OrderType
-    {
-        Market,
-        Limit,
-        Stop,
-        StopLimit //stake doesn't support this option yet
     }
 }

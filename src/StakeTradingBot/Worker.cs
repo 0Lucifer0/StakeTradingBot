@@ -28,8 +28,12 @@ namespace StakeTradingBot
                     var marketStatus = await _tradingClient.GetMarketStatus();
                     var availableCash = await _tradingClient.GetCashAvailable();
                     _logger.LogInformation("Cash Available : {0} USD", availableCash);
-
-                    if (marketStatus.Current == MarketStatus.Close)
+                    await _tradingClient.Buy(new Order
+                    {
+                        Symbol = "MSFT",
+                        Quantity = 1
+                    });
+                    if (marketStatus.Current != MarketStatus.Open)
                     {
                         _logger.LogInformation("Waiting next opening", marketStatus.ChangeAt);
                         var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.Now.ToUniversalTime(), TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
