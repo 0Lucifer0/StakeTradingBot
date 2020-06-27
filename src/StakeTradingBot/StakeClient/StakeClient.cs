@@ -17,9 +17,9 @@ namespace StakeTradingBot.StakeClient
         private readonly ILogger<StakeClient> _logger;
         private readonly Uri _uri = new Uri("https://prd-api.stake.com.au/api/");
         private DateTime? _lastConnectionDate;
-        private readonly Configuration.Configuration _configuration;
+        private readonly Configuration.StakeConfiguration _configuration;
         private AuthModel? _authModel;
-        public StakeClient(IHttpClientFactory clientFactory, ILogger<StakeClient> logger, Configuration.Configuration configuration)
+        public StakeClient(IHttpClientFactory clientFactory, ILogger<StakeClient> logger, Configuration.StakeConfiguration configuration)
         {
             _clientFactory = clientFactory;
             _logger = logger;
@@ -42,8 +42,8 @@ namespace StakeTradingBot.StakeClient
             };
             var content = new StringContent(JsonSerializer.Serialize(new
             {
-                _configuration.StakeClient.Username,
-                _configuration.StakeClient.Password,
+                _configuration.Username,
+                _configuration.Password,
                 rememberMeDays = "30"
             }, options), Encoding.UTF8, "application/json");
 
@@ -60,7 +60,7 @@ namespace StakeTradingBot.StakeClient
             throw new ArgumentException();
         }
 
-        public async Task<MarketStatusType> GetMarketStatus()
+        public async Task<Status> GetMarketStatus()
         {
             var httpClient = _clientFactory.CreateClient();
             httpClient.BaseAddress = _uri;
@@ -74,7 +74,7 @@ namespace StakeTradingBot.StakeClient
                 options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 var marketStatus = JsonSerializer.Deserialize<MarketStatusType>(await result.Content.ReadAsStringAsync(), options);
                 _logger.LogInformation(marketStatus.Response.Message, result.ReasonPhrase);
-                return marketStatus;
+                return marketStatus.Response.Status;
             }
             _logger.LogError("Retrieving market status failed", result.ReasonPhrase);
             throw new ArgumentException();

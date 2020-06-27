@@ -27,14 +27,14 @@ namespace StakeTradingBot
                 {
                     var marketStatus = await _tradingClient.GetMarketStatus();
                     var availableCash = await _tradingClient.GetCashAvailable();
-                    _logger.LogInformation("Cash Available : {0} USD", );
+                    _logger.LogInformation("Cash Available : {0} USD", availableCash);
 
-                    if (marketStatus.Response.Status.Current == MarketStatus.Close)
+                    if (marketStatus.Current == MarketStatus.Close)
                     {
-                        _logger.LogInformation("Waiting next opening", marketStatus.Response.Status.ChangeAt);
+                        _logger.LogInformation("Waiting next opening", marketStatus.ChangeAt);
                         var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.Now.ToUniversalTime(), TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
                         var next = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
-                        next = next.Add(TimeSpan.Parse(marketStatus.Response.Status.ChangeAt));
+                        next = next.Add(TimeSpan.Parse(marketStatus.ChangeAt));
                         if (next < now)
                         {
                             if (next.DayOfWeek == DayOfWeek.Friday || next.DayOfWeek == DayOfWeek.Saturday)

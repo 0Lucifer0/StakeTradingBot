@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
+using StakeTradingBot.Configuration;
 using StakeTradingBot.StakeClient;
 
 namespace StakeTradingBot
@@ -18,9 +20,8 @@ namespace StakeTradingBot
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            var configuration = new Configuration.Configuration();
-            new ConfigurationBuilder().AddYamlFile("config.yml").Build().Bind(configuration);
-            Validator.ValidateObject(configuration, new ValidationContext(configuration), true);
+            var conf = new ConfigurationBuilder().AddYamlFile("config.yml").Build();
+            Validator.ValidateObject(conf, new ValidationContext(conf), true);
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.Console(outputTemplate: "{Level:u4} {Timestamp:HH:mm:ss} -- {Message:lj}{NewLine}{Exception}")
@@ -38,9 +39,25 @@ namespace StakeTradingBot
                 )
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddSingleton(configuration);
                     services.AddHttpClient();
-                    services.AddTransient<ITradingClient, StakeClient.StakeClient>();
+                    switch (conf.GetValue<string>("Provider"))
+                    {
+                        case "Stake":
+                            var stakeConfiguration = new StakeConfiguration();
+                            conf.Bind(stakeConfiguration);
+                            services.AddSingleton(stakeConfiguration);
+                            services.AddTransient<ITradingClient, StakeClient.StakeClient>();
+                            break;
+
+                        case "AlpacaPaperTrading":
+                        default:
+                            var alpacaPaperConfiguration = new AlpacaPaperTradingClientConfiguration();
+                            conf.Bind(alpacaPaperConfiguration);
+                            services.AddSingleton(alpacaPaperConfiguration);
+                            services.AddTransient<ITradingClient, AlpacaPaperTradingClient>();
+                            break;
+                    }
+
                     services.AddHostedService<Worker>();
                 }); 
         }

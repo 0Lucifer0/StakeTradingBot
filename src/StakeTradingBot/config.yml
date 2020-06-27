@@ -1,3 +1,7 @@
-﻿StakeClient:
+﻿Provider: 'AlpacaPaperTrading'
+StakeClient:
   Username: ''
   Password: ''
+AlpacaPaperTradingClient:
+  ApiKey: ''
+  ApiSecret: ''

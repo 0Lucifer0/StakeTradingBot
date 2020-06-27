@@ -7,7 +7,7 @@ namespace StakeTradingBot
     {
         public Task LoginAsync();
 
-        public Task<MarketStatusType> GetMarketStatus();
+        public Task<Status> GetMarketStatus();
 
         public Task<Instrument?> GetInstrumentFromSymbol(string symbol);
 
