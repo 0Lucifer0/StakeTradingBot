@@ -85,7 +85,7 @@ namespace StakeTradingBot.AlpacaPaperTradingClient
             httpClient.DefaultRequestHeaders.Add("APCA-API-KEY-ID", _configuration.ApiKey);
             httpClient.DefaultRequestHeaders.Add("APCA-API-SECRET-KEY", _configuration.ApiSecret);
 
-            var result = await httpClient.GetAsync($"/v2/assets/{symbol}");
+            var result = await httpClient.GetAsync($"v2/assets/{symbol}");
             if (result.IsSuccessStatusCode)
             {
                 var options = new JsonSerializerOptions

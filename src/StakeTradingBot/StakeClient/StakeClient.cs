@@ -105,7 +105,7 @@ namespace StakeTradingBot.StakeClient
             throw new ArgumentException();
         }
 
-        private async Task SendTransaction(TransactionType transactionType, Order order)
+        private async Task SendTransaction(Order order)
         {
             var instrument = await GetInstrumentFromSymbol(order.Symbol);
             if (instrument == null)
@@ -137,25 +137,27 @@ namespace StakeTradingBot.StakeClient
                 UserId = _authModel.UserId.ToString()
             }, options), Encoding.UTF8, "application/json");
 
-            var result = await httpClient.PostAsync($"{transactionType.ToString().ToLowerInvariant()}orders", content);
+            var result = await httpClient.PostAsync($"{order.TransactionType.ToString().ToLowerInvariant()}orders", content);
             if (result.IsSuccessStatusCode)
             {
-                _logger.LogInformation($"{transactionType} order submitted!");
+                _logger.LogInformation($"{order.TransactionType} order submitted!");
                 return;
             }
 
-            _logger.LogError($"Error while {transactionType}ing order failed", result.ReasonPhrase);
+            _logger.LogError($"Error while {order.TransactionType}ing order failed", result.ReasonPhrase);
             throw new ArgumentException();
         }
 
         public Task Sell(Order order)
         {
-            return SendTransaction(TransactionType.Sell, order);
+            order.TransactionType = TransactionType.Sell;
+            return SendTransaction(order);
         }
 
         public Task Buy(Order order)
         {
-            return SendTransaction(TransactionType.Buy, order);
+            order.TransactionType = TransactionType.Buy;
+            return SendTransaction(order);
         }
 
         public async Task<float> GetCashAvailable()

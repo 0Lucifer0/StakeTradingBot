@@ -1,5 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,6 +11,7 @@ using Serilog;
 using Serilog.Events;
 using StakeTradingBot.Configuration;
 using StakeTradingBot.StakeClient;
+using StakeTradingBot.Strategy;
 
 namespace StakeTradingBot
 {
@@ -27,6 +31,7 @@ namespace StakeTradingBot
                 .WriteTo.Console(outputTemplate: "{Level:u4} {Timestamp:HH:mm:ss} -- {Message:lj}{NewLine}{Exception}")
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .CreateLogger();
             return Host.CreateDefaultBuilder(args)
                 .UseWindowsService()
@@ -57,9 +62,14 @@ namespace StakeTradingBot
                             services.AddTransient<ITradingClient, AlpacaPaperTradingClient.AlpacaPaperTradingClient>();
                             break;
                     }
-
+                    services.AddDbContext<StakeTradingBotContext>(options => options.UseSqlite("Data Source=./StakeTradingBot.db"));
+                    AppDomain.CurrentDomain.GetAssemblies()
+                        .SelectMany(s => s.GetTypes())
+                        .Where(p => typeof(IStrategy).IsAssignableFrom(p)).ToList().ForEach(t =>
+                            services.RegisterAsImplementedInterfaces(t, ServiceLifetime.Transient));
+                    
                     services.AddHostedService<Worker>();
-                }); 
+                });
         }
     }
 }
