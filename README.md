@@ -1,5 +1,5 @@
 # StakeTradingBot #
-[![Travis build status](https://travis-ci.org/0Lucifer0/StakeTradingBot.svg?branch=master)](https://travis-ci.org/0Lucifer0/StakeTradingBot)<br/>
+[![.NET](https://github.com/0Lucifer0/StakeTradingBot/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/0Lucifer0/StakeTradingBot/actions/workflows/dotnet.yml)<br/>
 This tool automatically trade stocks.
 
 ## Referral Links ##
