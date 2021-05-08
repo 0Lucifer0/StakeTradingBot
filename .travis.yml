@@ -1,27 +1,22 @@
-language: csharp
-mono: none
-dist: xenial
-os: linux
-addons:
-  snaps:
-    - name: dotnet-sdk
-      confinement: classic
-      channel: 5.0/stable
-install:
-  - 'export PATH="$PATH:/home/travis/.dotnet/tools"'
-  - 'export PATH="$PATH:$HOME/.local/bin"'
-  - pip install --user awscli
-  - sudo snap alias dotnet-sdk.dotnet dotnet
-  - dotnet --version
-env:
-  global:
-    - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
-    - DOTNET_CLI_TELEMETRY_OPTOUT=1
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 jobs:
-  include:
-    - stage: test_unit_testing
-      name: Run tests on StakeTradingBot
-      script:
-        - dotnet restore
-        - dotnet build
-        - dotnet test test/StakeTradingBot.Tests -v m
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+        
+    - name: Run Unit Tests
+      run: |
+        dotnet restore
+        dotnet build
+        dotnet test test/StakeTradingBot.Tests -v m
